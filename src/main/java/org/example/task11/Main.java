@@ -1,32 +1,24 @@
 package org.example.task11;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
-class CountableList extends ArrayList<Integer> {
-
-    private int addCount = 0;
-
-    @Override
-    public void addFirst(Integer element) {
-        addCount++;
-        super.addFirst(element);
-    }
-
-    public int getAddCount() {
-        return addCount;
-    }
-}
-
 public class Main {
     public static void main(String[] args) {
-        CountableList lst = new CountableList();
+        List<Integer> lst = new ArrayList<>(List.of(3, 4, 5));
 
-        lst.addAll(List.of(3, 4, 5));
+        AddListInvocationHandler handler =
+                new AddListInvocationHandler(lst);
+
+        lst = (List<Integer>) Proxy.newProxyInstance(
+                lst.getClass().getClassLoader(),
+                lst.getClass().getInterfaces(),
+                handler
+        );
 
         Magic.test(lst);
 
-        System.out.println("Количество вызовов addFirst: "
-                + lst.getAddCount());
+        System.out.println(handler.count);
     }
 }
